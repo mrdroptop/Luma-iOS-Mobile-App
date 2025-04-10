@@ -92,7 +92,8 @@ struct ProductView: View {
                             Task {
                                 if ATTrackingManager.trackingAuthorizationStatus == .authorized {
                                     // Send saveForLater commerce experience event
-                                    
+                                    MobileSDK.shared.sendCommerceExperienceEvent(commerceEventType: "saveForLaters", product: product)
+
                                 }
                             }
                             showSaveForLaterDialog.toggle()
@@ -107,7 +108,7 @@ struct ProductView: View {
                             Task {
                                 if ATTrackingManager.trackingAuthorizationStatus == .authorized {
                                     // Send productListAdds commerce experience event
-                                    
+                                    MobileSDK.shared.sendCommerceExperienceEvent(commerceEventType: "productListAdds", product: product)
                                 }
                             }
                             showAddToCartDialog.toggle()
@@ -122,7 +123,8 @@ struct ProductView: View {
                             Task {
                                 if ATTrackingManager.trackingAuthorizationStatus == .authorized {
                                     // Send purchase commerce experience event
-                                    
+                                    MobileSDK.shared.sendCommerceExperienceEvent(commerceEventType: "purchases", product: product)
+
                                     // Update attributes
                                     
                                 }
@@ -144,7 +146,8 @@ struct ProductView: View {
         .task {
             if ATTrackingManager.trackingAuthorizationStatus == .authorized {
                 // Send productViews commerce experience event
-                
+                MobileSDK.shared.sendCommerceExperienceEvent(commerceEventType: "productViews", product: product)
+
             }
         }
         .onAppear {

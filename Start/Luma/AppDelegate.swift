@@ -28,7 +28,7 @@ import UserNotifications
 import os.log
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    @AppStorage("environmentFileId") private var environmentFileId = "YOUR_ENVIRONMENT_ID_GOES_HERE"
+    @AppStorage("environmentFileId") private var environmentFileId = "d4d114c60e50/50594e7e7fa5/launch-d73e83f1ee72-development"
     @AppStorage("currentDeviceToken") private var currentDeviceToken = ""
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
@@ -39,9 +39,38 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         let appState = application.applicationState;
         
         // Define extensions
-        
-        
+        let extensions = [
+            AEPIdentity.Identity.self,
+            Lifecycle.self,
+            Signal.self,
+            Edge.self,
+            AEPEdgeIdentity.Identity.self,
+            Consent.self,
+            UserProfile.self,
+            Places.self,
+            Messaging.self,
+            Optimize.self,
+            Assurance.self
+        ]
+
         // Register extensions
+        MobileCore.registerExtensions(extensions, {
+            // Use the environment file id assigned to this application via Adobe Experience Platform Data Collection
+            Logger.aepMobileSDK.info("Luma - using mobile config: \(self.environmentFileId)")
+            MobileCore.configureWith(appId: self.environmentFileId)
+
+            // set this to false or comment it when deploying to TestFlight (default is false),
+            // set this to true when testing on your device.
+            MobileCore.updateConfigurationWith(configDict: ["messaging.useSandbox": true])
+            if appState != .background {
+                // only start lifecycle if the application is not in the background
+                MobileCore.lifecycleStart(additionalContextData: nil)
+            }
+
+            // assume unknown, adapt to your needs.
+            MobileCore.setPrivacyStatus(.unknown)
+        })
+
        
         
         // update version and build

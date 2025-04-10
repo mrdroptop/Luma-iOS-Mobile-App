@@ -27,17 +27,25 @@ class SceneDelegate: NSObject, UIWindowSceneDelegate {
     
     func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
         // Called when the app in background is opened with a deep link.
+        if let deepLinkURL = URLContexts.first?.url {
+            // Start the Assurance session
+            Assurance.startSession(url: deepLinkURL)
+        }
+
         
     }
     
     func sceneWillEnterForeground(_ scene: UIScene) {
         // When in foreground start lifecycle data collection
+        MobileCore.lifecycleStart(additionalContextData: nil)
         
     }
     
     
     func sceneDidEnterBackground(_ scene: UIScene) {
         // When in background pause lifecycle data collection
+        MobileCore.lifecyclePause()
+
         
     }
 }

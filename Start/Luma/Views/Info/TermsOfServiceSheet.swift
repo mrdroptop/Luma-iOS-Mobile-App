@@ -50,7 +50,25 @@ final class SwiftUIWebViewModel: ObservableObject {
     func loadUrl() {
         let url = Bundle.main.url(forResource: "tou", withExtension: "html")
         if var urlString = url?.absoluteString {
-            //  Handle web view
+            
+            // Handle web view
+            AEPEdgeIdentity.Identity.getUrlVariables {(urlVariables, error) in
+                if let error = error {
+                    print("Error with Webview", error)
+                    return;
+                }
+
+                if let urlVariables: String = urlVariables {
+                    urlString.append("?" + urlVariables)
+                    guard let url = URL(string: urlString) else {
+                        return
+                    }
+                    DispatchQueue.main.async {
+                        self.webView.load(URLRequest(url: url))
+                    }
+                }
+                Logger.aepMobileSDK.info("Successfully retrieved urlVariables for WebView, final URL: \(urlString)")
+            }
             
         }
     }

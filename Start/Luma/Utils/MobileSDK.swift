@@ -84,19 +84,44 @@ struct MobileSDK {
     /// - Parameter value: "y" or "n"
     func updateConsent(value: String) {
         // Update consent
+        let collectConsent = ["collect": ["val": value]]
+        let currentConsents = ["consents": collectConsent]
+        Consent.update(with: currentConsents)
+        MobileCore.updateConfigurationWith(configDict: currentConsents)
         
     }
     
     /// Get consents
     func getConsents() {
         // Get consents
-        
+        Consent.getConsents { consents, error in
+           guard error == nil, let consents = consents else { return }
+           guard let jsonData = try? JSONSerialization.data(withJSONObject: consents, options: .prettyPrinted) else { return }
+           guard let jsonStr = String(data: jsonData, encoding: .utf8) else { return }
+           Logger.aepMobileSDK.info("Consent getConsents: \(jsonStr)")
+        }
     }
     
     /// Send app interaction event
     /// - Parameter actionName: string identifying the action, e.g. "login"
     func sendAppInteractionEvent(actionName: String) {
         // Set up a data dictionary, create an experience event and send the event.
+        let xdmData: [String: Any] = [
+            "eventType": "application.interaction",
+            tenant : [
+                "appInformation": [
+                    "appInteraction": [
+                        "name": actionName,
+                        "appAction": [
+                            "value": 1
+                        ]
+                    ]
+                ]
+            ]
+        ]
+        let appInteractionEvent = ExperienceEvent(xdm: xdmData)
+        Edge.sendEvent(experienceEvent: appInteractionEvent)
+
         
     }
     
@@ -104,15 +129,49 @@ struct MobileSDK {
     /// - Parameter stateName: a string identifying the screen, e.g. "luma: content: ios: us: en: login"
     func sendTrackScreenEvent(stateName: String) {
         // Set up a data dictionary, create an experience event and send the event.
-        
+        let xdmData: [String: Any] = [
+            "eventType": "application.scene",
+            tenant : [
+                "appInformation": [
+                    "appStateDetails": [
+                        "screenType": "App",
+                        "screenName": stateName,
+                        "screenView": [
+                            "value": 1
+                        ]
+                    ]
+                ]
+            ]
+        ]
+        let trackScreenEvent = ExperienceEvent(xdm: xdmData)
+        Edge.sendEvent(experienceEvent: trackScreenEvent)
     }
     
-    /// Sends an experienc event containing commerce and productListItems data
+    /// Sends an experience event containing commerce and productListItems data
     /// - Parameters:
     ///   - commerceEventType: type of commerce event
     ///   - product: product object containing  details of the product selected
     func sendCommerceExperienceEvent(commerceEventType: String, product: Product) {
         // Set up a data dictionary, create an experience event and send the event.
+        let xdmData: [String: Any] = [
+            "eventType": "commerce." + commerceEventType,
+            "commerce": [
+                commerceEventType: [
+                    "value": 1
+                ]
+            ],
+            "productListItems": [
+                [
+                    "name": product.name,
+                    "priceTotal": product.price,
+                    "SKU": product.sku
+                ]
+            ]
+        ]
+
+        let commerceExperienceEvent = ExperienceEvent(xdm: xdmData)
+        Edge.sendEvent(experienceEvent: commerceExperienceEvent)
+
         
     }
     
@@ -121,7 +180,17 @@ struct MobileSDK {
     ///   - emailAddress: email address
     ///   - crmId: crmId
     func updateIdentities(emailAddress: String, crmId: String) {
+        
         // Set up identity map, add identities to map and update identities
+        let identityMap: IdentityMap = IdentityMap()
+
+        let emailIdentity = IdentityItem(id: emailAddress, authenticatedState: AuthenticatedState.authenticated)
+        let crmIdentity = IdentityItem(id: crmId, authenticatedState: AuthenticatedState.authenticated)
+        identityMap.add(item:emailIdentity, withNamespace: "Email")
+        identityMap.add(item: crmIdentity, withNamespace: "lumaCRMId")
+
+        Identity.updateIdentities(with: identityMap)
+
         
     }
     
@@ -131,6 +200,11 @@ struct MobileSDK {
     ///   - crmId: crmID
     func removeIdentities(emailAddress: String, crmId: String) {
         // Remove identities and reset email and CRM Id to their defaults
+        Identity.removeIdentity(item: IdentityItem(id: emailAddress), withNamespace: "Email")
+        Identity.removeIdentity(item: IdentityItem(id: crmId), withNamespace: "lumaCRMId")
+        currentEmailId = "testUser@gmail.com"
+        currentCRMId = "112ca06ed53d3db37e4cea49cc45b71e"
+
         
     }
     

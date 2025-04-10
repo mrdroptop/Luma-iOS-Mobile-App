@@ -53,7 +53,8 @@ struct LoginSheet: View {
                         HStack {
                             Button("Logout", role: .destructive) {
                                 // Remove identities
-                                
+                                MobileSDK.shared.removeIdentities(emailAddress: currentEmailId, crmId: currentCRMId)
+
                                 dismiss()
                             }
                             .buttonStyle(.bordered)
@@ -100,10 +101,12 @@ struct LoginSheet: View {
                             Spacer()
                             
                             Button("Login") {
+                             
                                 // Update identities
-                                
+                                MobileSDK.shared.updateIdentities(emailAddress: currentEmailId, crmId: currentCRMId)
                                 
                                 // Send app interaction event
+                                MobileSDK.shared.sendAppInteractionEvent(actionName: "login")
                                 
                                 dismiss()
                             }
@@ -134,6 +137,8 @@ struct LoginSheet: View {
                 }
             }
             // Send track screen event
+            MobileSDK.shared.sendTrackScreenEvent(stateName: "luma: content: ios: us: en: login")
+
             
         }
     }

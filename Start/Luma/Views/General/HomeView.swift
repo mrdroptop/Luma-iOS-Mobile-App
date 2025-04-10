@@ -134,6 +134,7 @@ struct HomeView: View {
         
         .task {
             // Ask status of consents
+            MobileSDK.shared.getConsents()
             
         }
         .onAppear {

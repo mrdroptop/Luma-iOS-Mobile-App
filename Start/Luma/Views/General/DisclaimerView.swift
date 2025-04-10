@@ -42,6 +42,15 @@ struct DisclaimerView: View {
                 Button("Continue…") {
                     ATTrackingManager.requestTrackingAuthorization { status in
                         // Add consent based on authorization
+                        if status == .authorized {
+                           // Set consent to yes
+                           MobileSDK.shared.updateConsent(value: "y")
+                        }
+                        else {
+                           // Set consent to yes
+                           MobileSDK.shared.updateConsent(value: "n")
+                        }
+
                         
                         Logger.aepMobileSDK.info("Luma - ATTrackingManager status: \(status.self.rawValue)")
                     }

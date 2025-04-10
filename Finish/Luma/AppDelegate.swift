@@ -28,7 +28,7 @@ import UserNotifications
 import os.log
 
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    @AppStorage("environmentFileId") private var environmentFileId = "b5cbd1a1220e/1857ef6cacb5/launch-2594f26b23cd-development"
+    @AppStorage("environmentFileId") private var environmentFileId = "d4d114c60e50/50594e7e7fa5/launch-d73e83f1ee72-development"
     @AppStorage("currentDeviceToken") private var currentDeviceToken = ""
     
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
